@@ -4,6 +4,7 @@ import GAME_CONFIG, { COLORS } from '../config/gameConfig.js';
 import ParticleEffects from '../utils/ParticleEffects.js';
 import TelegramAPI from '../utils/TelegramAPI.js';
 import TextureOptimizer from '../utils/TextureOptimizer.js';
+import PipeManager from '../utils/PipeManager.js';
 
 export class GameScene extends Phaser.Scene {
   constructor() {
@@ -20,9 +21,18 @@ export class GameScene extends Phaser.Scene {
 
   preload() {
     SpriteLoader.loadBirds(this, 'style1');
-    SpriteLoader.loadPipes(this, 'style1');
+    PipeManager.loadPipeImages(this);
     SpriteLoader.loadBackgrounds(this, [0]);
     SpriteLoader.loadGround(this, 'style1');
+    
+    // Create simple pipe texture
+    const graphics = this.add.graphics();
+    graphics.fillStyle(0x5cb85c, 1);
+    graphics.fillRect(0, 0, 60, 60);
+    graphics.lineStyle(4, 0x4a9a4a, 1);
+    graphics.strokeRect(0, 0, 60, 60);
+    graphics.generateTexture('pipe-rect', 60, 60);
+    graphics.destroy();
   }
 
   create() {
@@ -153,47 +163,12 @@ export class GameScene extends Phaser.Scene {
   spawnPipe() {
     if (this.isGameOver) return;
     
-    const gapY = Phaser.Math.Between(
-      GAME_CONFIG.pipes.minGapY,
-      GAME_CONFIG.pipes.maxGapY
-    );
+    const gap = GAME_CONFIG.pipes.gap;
+    const pipeX = GAME_CONFIG.width + 50;
     
-    const pipeFrame = SpriteLoader.getRandomPipeFrame('style1');
-    
-    const pipeTop = this.pipesGroup.create(
-      GAME_CONFIG.width + 50,
-      gapY - GAME_CONFIG.pipes.gap / 2,
-      SpriteLoader.getPipeKey('style1'),
-      pipeFrame
-    );
-    pipeTop.setScale(GAME_CONFIG.pipes.scale);
-    pipeTop.setOrigin(0.5, 1);
-    pipeTop.body.setSize(
-      GAME_CONFIG.pipes.width * 0.8,
-      GAME_CONFIG.pipes.height
-    );
-    pipeTop.body.allowGravity = false;
-    pipeTop.setVelocityX(-this.gameSpeed);
-    pipeTop.setImmovable(true);
-    pipeTop.pipeId = Date.now();
-    
-    const pipeBottom = this.pipesGroup.create(
-      GAME_CONFIG.width + 50,
-      gapY + GAME_CONFIG.pipes.gap / 2,
-      SpriteLoader.getPipeKey('style1'),
-      pipeFrame
-    );
-    pipeBottom.setScale(GAME_CONFIG.pipes.scale);
-    pipeBottom.setOrigin(0.5, 0);
-    pipeBottom.setFlipY(true);
-    pipeBottom.body.setSize(
-      GAME_CONFIG.pipes.width * 0.8,
-      GAME_CONFIG.pipes.height
-    );
-    pipeBottom.body.allowGravity = false;
-    pipeBottom.setVelocityX(-this.gameSpeed);
-    pipeBottom.setImmovable(true);
-    pipeBottom.pipeId = pipeTop.pipeId;
+    console.log('Spawning pipes at x:', pipeX, 'gap:', gap, 'speed:', this.gameSpeed);
+    const pipes = PipeManager.createSimplePipePair(this, pipeX, gap, this.pipesGroup, this.gameSpeed);
+    console.log('Pipes created:', pipes);
   }
 
   flap() {
@@ -239,7 +214,9 @@ export class GameScene extends Phaser.Scene {
       this.gameSpeed += GAME_CONFIG.difficulty.speedIncreaseAmount;
       
       this.pipesGroup.children.entries.forEach(pipe => {
-        pipe.setVelocityX(-this.gameSpeed);
+        if (pipe.body) {
+          pipe.body.setVelocityX(-this.gameSpeed);
+        }
       });
     }
   }

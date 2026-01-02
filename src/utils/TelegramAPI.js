@@ -2,10 +2,19 @@ export class TelegramAPI {
   constructor() {
     this.tg = window.Telegram?.WebApp;
     this.isAvailable = !!this.tg;
+    this.cloudStorageAvailable = false;
     
     if (this.isAvailable) {
       this.tg.ready();
       this.tg.expand();
+      
+      // Check if CloudStorage is actually available (not just present)
+      this.cloudStorageAvailable = !!(
+        this.tg.CloudStorage && 
+        typeof this.tg.CloudStorage.getItem === 'function' &&
+        this.tg.version && 
+        parseFloat(this.tg.version) >= 6.1
+      );
     }
   }
 
@@ -26,26 +35,46 @@ export class TelegramAPI {
   }
 
   hapticImpact(style = 'light') {
-    if (this.isAvailable && this.tg.HapticFeedback) {
-      this.tg.HapticFeedback.impactOccurred(style);
+    const tg = window.Telegram?.WebApp;
+    if (tg && tg.HapticFeedback && typeof tg.HapticFeedback.impactOccurred === 'function') {
+      try {
+        tg.HapticFeedback.impactOccurred(style);
+      } catch (e) {
+        // Haptic not supported in this version
+      }
     }
   }
 
   hapticNotification(type = 'success') {
-    if (this.isAvailable && this.tg.HapticFeedback) {
-      this.tg.HapticFeedback.notificationOccurred(type);
+    const tg = window.Telegram?.WebApp;
+    if (tg && tg.HapticFeedback && typeof tg.HapticFeedback.notificationOccurred === 'function') {
+      try {
+        tg.HapticFeedback.notificationOccurred(type);
+      } catch (e) {
+        // Haptic not supported in this version
+      }
     }
   }
 
   hapticSelection() {
-    if (this.isAvailable && this.tg.HapticFeedback) {
-      this.tg.HapticFeedback.selectionChanged();
+    const tg = window.Telegram?.WebApp;
+    if (tg && tg.HapticFeedback && typeof tg.HapticFeedback.selectionChanged === 'function') {
+      try {
+        tg.HapticFeedback.selectionChanged();
+      } catch (e) {
+        // Haptic not supported in this version
+      }
     }
   }
 
   saveToCloud(key, value, callback) {
-    if (this.isAvailable && this.tg.CloudStorage) {
-      this.tg.CloudStorage.setItem(key, value.toString(), callback);
+    if (this.cloudStorageAvailable) {
+      try {
+        this.tg.CloudStorage.setItem(key, value.toString(), callback);
+      } catch (e) {
+        localStorage.setItem(key, value.toString());
+        if (callback) callback(null);
+      }
     } else {
       localStorage.setItem(key, value.toString());
       if (callback) callback(null);
@@ -53,8 +82,13 @@ export class TelegramAPI {
   }
 
   loadFromCloud(key, callback) {
-    if (this.isAvailable && this.tg.CloudStorage) {
-      this.tg.CloudStorage.getItem(key, callback);
+    if (this.cloudStorageAvailable) {
+      try {
+        this.tg.CloudStorage.getItem(key, callback);
+      } catch (e) {
+        const value = localStorage.getItem(key);
+        if (callback) callback(null, value);
+      }
     } else {
       const value = localStorage.getItem(key);
       if (callback) callback(null, value);
