@@ -22,12 +22,12 @@ export const GAME_CONFIG = {
     width: 128,
     height: 213,
     scale: 1.5,
-    gap: 180,
+    gap: 150,
     minGapY: 100,
     maxGapY: 400,
-    spawnDistance: 400,
+    spawnDistance: 300,
     speed: 200,
-    spawnInterval: 2000,
+    spawnInterval: 1500,
   },
   
   ground: {
@@ -62,6 +62,7 @@ export const GAME_CONFIG = {
     start: 'StartScene',
     game: 'GameScene',
     gameOver: 'GameOverScene',
+    settings: 'SettingsScene',
   },
 };
 

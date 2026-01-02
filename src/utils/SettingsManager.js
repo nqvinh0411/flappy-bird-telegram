@@ -5,6 +5,10 @@ export class SettingsManager {
     this.telegram = new TelegramAPI();
     this.storageKey = 'flappy_bird_settings';
     this.settings = {
+      theme: 'style1',           // style1, style2, style3
+      pipeColor: 'random',       // 'random' hoặc 0-7
+      groundStyle: 0,            // 0 hoặc 1
+      backgroundIndex: 0,        // 0-6
       selectedBird: 'bird1-1',
       selectedBackground: 0,
       soundEnabled: true,
@@ -78,7 +82,43 @@ export class SettingsManager {
     return this.settings.musicEnabled;
   }
 
-  getSettings() {
+  getTheme() {
+    return this.settings.theme;
+  }
+
+  setTheme(theme) {
+    this.settings.theme = theme;
+    this.saveSettings();
+  }
+
+  getPipeColor() {
+    return this.settings.pipeColor;
+  }
+
+  setPipeColor(color) {
+    this.settings.pipeColor = color;
+    this.saveSettings();
+  }
+
+  getGroundStyle() {
+    return this.settings.groundStyle;
+  }
+
+  setGroundStyle(style) {
+    this.settings.groundStyle = style;
+    this.saveSettings();
+  }
+
+  getBackgroundIndex() {
+    return this.settings.backgroundIndex;
+  }
+
+  setBackgroundIndex(index) {
+    this.settings.backgroundIndex = index;
+    this.saveSettings();
+  }
+
+  getAllSettings() {
     return { ...this.settings };
   }
 }

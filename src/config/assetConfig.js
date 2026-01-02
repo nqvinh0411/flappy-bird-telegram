@@ -1,3 +1,31 @@
+// Theme configuration
+export const THEMES = {
+  style1: {
+    name: 'Classic',
+    path: 'Style 1'
+  },
+  style2: {
+    name: 'Dark',
+    path: 'Style 2'
+  },
+  style3: {
+    name: 'Retro',
+    path: 'Style 3'
+  }
+};
+
+// Pipe colors mapping (8 colors per theme)
+export const PIPE_COLORS = {
+  0: { name: 'Green', col: 0, row: 0 },
+  1: { name: 'Orange', col: 1, row: 0 },
+  2: { name: 'Red', col: 2, row: 0 },
+  3: { name: 'Blue', col: 3, row: 0 },
+  4: { name: 'Gray', col: 0, row: 1 },
+  5: { name: 'Purple', col: 1, row: 1 },
+  6: { name: 'Brown', col: 2, row: 1 },
+  7: { name: 'Dark Orange', col: 3, row: 1 }
+};
+
 export const SPRITE_CONFIG = {
   birds: {
     style1: [
@@ -108,20 +136,44 @@ export const SPRITE_CONFIG = {
     style1: {
       key: 'pipes-1',
       path: 'assets/Style 1/Pipes-1.png',
-      frameConfig: { frameWidth: 128, frameHeight: 213 },
+      imageWidth: 512,
+      imageHeight: 640,
       cols: 4,
-      rows: 3,
-      frameCount: 12,
-      description: 'Grid 4x3, mỗi pipe có 2 phần (đầu + thân)'
+      rows: 2,
+      frameWidth: 128,
+      frameHeight: 320,
+      capHeight: 48,
+      bodyHeight: 224,
+      colors: 8,
+      description: '4 cols x 2 rows = 8 complete pipe styles (128x320 each)'
     },
     style2: {
       key: 'pipes-2',
       path: 'assets/Style 2/Pipes-2.png',
-      frameConfig: { frameWidth: 128, frameHeight: 128 },
+      imageWidth: 512,
+      imageHeight: 384,
       cols: 4,
-      rows: 3,
-      frameCount: 12,
-      description: 'Grid 4x3, mỗi pipe có 2 phần (đầu + thân)'
+      rows: 2,
+      frameWidth: 128,
+      frameHeight: 192,
+      capHeight: 32,
+      bodyHeight: 128,
+      colors: 8,
+      description: '4 cols x 2 rows = 8 complete pipe styles'
+    },
+    style3: {
+      key: 'pipes-3',
+      path: 'assets/Style 3/Pipes-4.png',
+      imageWidth: 512,
+      imageHeight: 384,
+      cols: 4,
+      rows: 2,
+      frameWidth: 128,
+      frameHeight: 192,
+      capHeight: 32,
+      bodyHeight: 128,
+      colors: 8,
+      description: '4 cols x 2 rows = 8 complete pipe styles'
     }
   },
   
@@ -131,14 +183,33 @@ export const SPRITE_CONFIG = {
       path: 'assets/Style 1/Tiles-1.png',
       frameConfig: { frameWidth: 512, frameHeight: 64 },
       frameCount: 2,
-      description: '2 styles: xanh lá và nâu'
+      styles: [
+        { name: 'Green', frame: 0 },
+        { name: 'Gray', frame: 1 }
+      ],
+      description: '2 styles: xanh lá và xám'
     },
     style2: {
       key: 'ground-2',
-      path: 'assets/Style 2/Tile-2.png',
-      frameConfig: { frameWidth: 256, frameHeight: 64 },
+      path: 'assets/Style 2/Tiles-2.png',
+      frameConfig: { frameWidth: 512, frameHeight: 64 },
       frameCount: 2,
-      description: '2 styles ground tiles'
+      styles: [
+        { name: 'Style 1', frame: 0 },
+        { name: 'Style 2', frame: 1 }
+      ],
+      description: '2 styles ground'
+    },
+    style3: {
+      key: 'ground-3',
+      path: 'assets/Style 3/Tiles-3.png',
+      frameConfig: { frameWidth: 512, frameHeight: 64 },
+      frameCount: 2,
+      styles: [
+        { name: 'Style 1', frame: 0 },
+        { name: 'Style 2', frame: 1 }
+      ],
+      description: '2 styles ground'
     }
   },
   

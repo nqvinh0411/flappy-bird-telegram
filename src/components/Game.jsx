@@ -3,6 +3,7 @@ import Phaser from 'phaser';
 import StartScene from '../scenes/StartScene';
 import GameScene from '../scenes/GameScene';
 import GameOverScene from '../scenes/GameOverScene';
+import SettingsScene from '../scenes/SettingsScene';
 import GAME_CONFIG from '../config/gameConfig';
 
 function Game({ telegramUser }) {
@@ -29,7 +30,7 @@ function Game({ telegramUser }) {
           debug: false,
         },
       },
-      scene: [StartScene, GameScene, GameOverScene],
+      scene: [StartScene, GameScene, GameOverScene, SettingsScene],
       scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,

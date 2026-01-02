@@ -4,7 +4,8 @@ import GAME_CONFIG, { COLORS } from '../config/gameConfig.js';
 import ParticleEffects from '../utils/ParticleEffects.js';
 import TelegramAPI from '../utils/TelegramAPI.js';
 import TextureOptimizer from '../utils/TextureOptimizer.js';
-import PipeManager from '../utils/PipeManager.js';
+import PipeBuilder from '../utils/PipeBuilder.js';
+import SettingsManager from '../utils/SettingsManager.js';
 
 export class GameScene extends Phaser.Scene {
   constructor() {
@@ -17,26 +18,25 @@ export class GameScene extends Phaser.Scene {
     this.isGameOver = false;
     this.pipesPassed = new Set();
     this.telegram = new TelegramAPI();
+    this.settingsManager = new SettingsManager();
+    this.settings = this.settingsManager.getAllSettings();
+    this.currentTheme = this.settings.theme || 'style1';
+    this.currentPipeColor = this.settings.pipeColor || 'random';
+    
+    // Reset pipe color cho phiên chơi mới
+    PipeBuilder.resetSession();
   }
 
   preload() {
     SpriteLoader.loadBirds(this, 'style1');
-    PipeManager.loadPipeImages(this);
+    PipeBuilder.loadPipeTextures(this, this.currentTheme);
     SpriteLoader.loadBackgrounds(this, [0]);
-    SpriteLoader.loadGround(this, 'style1');
-    
-    // Create simple pipe texture
-    const graphics = this.add.graphics();
-    graphics.fillStyle(0x5cb85c, 1);
-    graphics.fillRect(0, 0, 60, 60);
-    graphics.lineStyle(4, 0x4a9a4a, 1);
-    graphics.strokeRect(0, 0, 60, 60);
-    graphics.generateTexture('pipe-rect', 60, 60);
-    graphics.destroy();
+    SpriteLoader.loadGround(this, this.currentTheme);
   }
 
   create() {
     SpriteLoader.createAllBirdAnimations(this, 'style1');
+    PipeBuilder.createPipeTextures(this, this.currentTheme);
     
     this.createBackground();
     this.createGround();
@@ -62,14 +62,15 @@ export class GameScene extends Phaser.Scene {
 
   createGround() {
     const groundY = GAME_CONFIG.height - GAME_CONFIG.ground.height / 2;
+    const groundFrame = this.settings.groundStyle || 0;
     
     this.ground = this.add.tileSprite(
       GAME_CONFIG.width / 2,
       groundY,
       GAME_CONFIG.width,
       GAME_CONFIG.ground.height,
-      SpriteLoader.getGroundKey('style1'),
-      0
+      SpriteLoader.getGroundKey(this.currentTheme),
+      groundFrame
     );
     
     this.physics.add.existing(this.ground, true);
@@ -94,7 +95,8 @@ export class GameScene extends Phaser.Scene {
   }
 
   createPipes() {
-    this.pipesGroup = this.physics.add.group();
+    // Lưu pipes trong array để quản lý
+    this.pipes = [];
   }
 
   createScore() {
@@ -121,18 +123,21 @@ export class GameScene extends Phaser.Scene {
   }
 
   setupCollisions() {
-    this.physics.add.overlap(
-      this.bird,
-      this.pipesGroup,
-      this.hitPipe,
-      null,
-      this
-    );
-    
+    // Collision với ground
     this.physics.add.overlap(
       this.bird,
       this.ground,
       this.hitGround,
+      null,
+      this
+    );
+  }
+  
+  addPipeCollision(pipe) {
+    this.physics.add.overlap(
+      this.bird,
+      pipe,
+      this.hitPipe,
       null,
       this
     );
@@ -164,11 +169,24 @@ export class GameScene extends Phaser.Scene {
     if (this.isGameOver) return;
     
     const gap = GAME_CONFIG.pipes.gap;
-    const pipeX = GAME_CONFIG.width + 50;
+    const pipeX = this.game.config.width + 50;
     
-    console.log('Spawning pipes at x:', pipeX, 'gap:', gap, 'speed:', this.gameSpeed);
-    const pipes = PipeManager.createSimplePipePair(this, pipeX, gap, this.pipesGroup, this.gameSpeed);
-    console.log('Pipes created:', pipes);
+    const result = PipeBuilder.createPipePair(
+      this,
+      pipeX,
+      gap,
+      null, // Không dùng group
+      this.gameSpeed,
+      this.currentTheme,
+      this.currentPipeColor
+    );
+    
+    if (result) {
+      // Lưu pipes và add collision
+      this.pipes.push(result.pipeTop, result.pipeBottom);
+      this.addPipeCollision(result.pipeTop);
+      this.addPipeCollision(result.pipeBottom);
+    }
   }
 
   flap() {
@@ -213,16 +231,19 @@ export class GameScene extends Phaser.Scene {
     if (this.gameSpeed < GAME_CONFIG.difficulty.maxSpeed) {
       this.gameSpeed += GAME_CONFIG.difficulty.speedIncreaseAmount;
       
-      this.pipesGroup.children.entries.forEach(pipe => {
+      this.pipes.forEach(pipe => {
         if (pipe.body) {
           pipe.body.setVelocityX(-this.gameSpeed);
+        }
+        if (pipe.cap && pipe.cap.body) {
+          pipe.cap.body.setVelocityX(-this.gameSpeed);
         }
       });
     }
   }
 
   updateScore() {
-    this.pipesGroup.children.entries.forEach(pipe => {
+    this.pipes.forEach(pipe => {
       if (
         pipe.x + pipe.displayWidth / 2 < this.bird.x &&
         !this.pipesPassed.has(pipe.pipeId)
@@ -246,10 +267,15 @@ export class GameScene extends Phaser.Scene {
   }
 
   cleanupPipes() {
-    this.pipesGroup.children.entries.forEach(pipe => {
+    this.pipes = this.pipes.filter(pipe => {
       if (pipe.x < -100) {
+        if (pipe.cap) {
+          pipe.cap.destroy();
+        }
         pipe.destroy();
+        return false;
       }
+      return true;
     });
   }
 

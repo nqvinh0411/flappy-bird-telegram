@@ -52,8 +52,11 @@ export class SpriteLoader {
       return;
     }
 
+    const key = animKey || bird.animKey;
+    if (scene.anims.exists(key)) return; // Skip if animation already exists
+    
     scene.anims.create({
-      key: animKey || bird.animKey,
+      key: key,
       frames: scene.anims.generateFrameNumbers(bird.key, { 
         start: 0, 
         end: bird.frameCount - 1 

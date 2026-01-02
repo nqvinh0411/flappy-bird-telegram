@@ -145,6 +145,43 @@ export class StartScene extends Phaser.Scene {
     this.input.on('pointerdown', this.startGame, this);
     
     this.input.keyboard.on('keydown-SPACE', this.startGame, this);
+    
+    // Settings button
+    this.createSettingsButton();
+  }
+  
+  createSettingsButton() {
+    const btnX = GAME_CONFIG.width - 50;
+    const btnY = 50;
+    
+    const settingsBtn = this.add.text(btnX, btnY, '', {
+      fontSize: '32px'
+    });
+    settingsBtn.setOrigin(0.5);
+    settingsBtn.setInteractive({ useHandCursor: true });
+    settingsBtn.setDepth(100);
+    
+    settingsBtn.on('pointerdown', (pointer) => {
+      pointer.event.stopPropagation();
+      this.telegram.hapticImpact('medium');
+      this.scene.start(GAME_CONFIG.scenes.settings);
+    });
+    
+    settingsBtn.on('pointerover', () => {
+      this.tweens.add({
+        targets: settingsBtn,
+        scale: 1.2,
+        duration: 100
+      });
+    });
+    
+    settingsBtn.on('pointerout', () => {
+      this.tweens.add({
+        targets: settingsBtn,
+        scale: 1,
+        duration: 100
+      });
+    });
   }
 
   async loadHighScore() {
