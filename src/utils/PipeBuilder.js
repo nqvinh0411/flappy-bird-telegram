@@ -90,9 +90,9 @@ export class PipeBuilder {
     const scale = pipeWidth / pipeConfig.frameWidth;
     const capDisplayHeight = pipeConfig.capHeight * scale;
     
-    // Gap position - scale theo chiều cao màn hình
-    const minGapY = gameHeight * 0.15;
-    const maxGapY = gameHeight - groundHeight - gap - gameHeight * 0.15;
+    // Gap position - đảm bảo có đủ không gian cho pipes
+    const minGapY = gap + 80; // Tối thiểu cách trên 80px + gap
+    const maxGapY = gameHeight - groundHeight - gap - 80; // Tối thiểu cách dưới 80px
     const gapY = Phaser.Math.Between(minGapY, maxGapY);
     
     // Sử dụng màu cố định cho cả phiên chơi
@@ -109,11 +109,13 @@ export class PipeBuilder {
     const pipeId = Date.now() + Math.random();
     
     // ========== TOP PIPE ==========
-    const topHeight = gapY;
+    // Kéo dài từ y=0 (trên cùng) xuống đến gap
+    const topHeight = gapY; // Chiều cao từ trên xuống gap
+    const topBodyHeight = topHeight - capDisplayHeight;
     
-    // Tạo body bằng image và scale chiều cao
-    const topBody = scene.add.image(x, topHeight / 2, bodyKey);
-    topBody.setDisplaySize(pipeWidth, topHeight - capDisplayHeight);
+    // Body - từ y=0 xuống
+    const topBody = scene.add.image(x, topBodyHeight / 2, bodyKey);
+    topBody.setDisplaySize(pipeWidth, topBodyHeight);
     topBody.setDepth(10);
     
     scene.physics.add.existing(topBody);
@@ -123,7 +125,7 @@ export class PipeBuilder {
     topBody.pipeId = pipeId;
     if (pipeGroup) pipeGroup.add(topBody);
     
-    // Top cap
+    // Cap - ở cuối pipe (trước gap)
     const topCap = scene.add.image(x, topHeight - capDisplayHeight / 2, capKey);
     topCap.setScale(scale);
     topCap.setFlipY(true);
@@ -133,10 +135,13 @@ export class PipeBuilder {
     topCap.body.setVelocityX(-speed);
     
     // ========== BOTTOM PIPE ==========
+    // Kéo dài từ gap xuống đến ground
     const bottomStartY = gapY + gap;
-    const bottomHeight = gameHeight - groundHeight - bottomStartY;
+    const bottomEndY = gameHeight - groundHeight;
+    const bottomHeight = bottomEndY - bottomStartY;
+    const bottomBodyHeight = bottomHeight - capDisplayHeight;
     
-    // Bottom cap
+    // Cap - ở đầu pipe (sau gap)
     const bottomCap = scene.add.image(x, bottomStartY + capDisplayHeight / 2, capKey);
     bottomCap.setScale(scale);
     bottomCap.setDepth(11);
@@ -144,9 +149,9 @@ export class PipeBuilder {
     bottomCap.body.allowGravity = false;
     bottomCap.body.setVelocityX(-speed);
     
-    // Bottom body
-    const bottomBody = scene.add.image(x, bottomStartY + capDisplayHeight + (bottomHeight - capDisplayHeight) / 2, bodyKey);
-    bottomBody.setDisplaySize(pipeWidth, bottomHeight - capDisplayHeight);
+    // Body - từ cap xuống ground
+    const bottomBody = scene.add.image(x, bottomStartY + capDisplayHeight + bottomBodyHeight / 2, bodyKey);
+    bottomBody.setDisplaySize(pipeWidth, bottomBodyHeight);
     bottomBody.setDepth(10);
     
     scene.physics.add.existing(bottomBody);
