@@ -23,12 +23,12 @@ export const GAME_CONFIG = {
     width: 128,
     height: 213,
     scale: 1.5,
-    gap: 150,
+    gap: 140, // Giảm gap mặc định
     minGapY: 100,
     maxGapY: 400,
     spawnDistance: 300,
-    speed: 200,
-    spawnInterval: 1500,
+    speed: 220, // Tăng tốc độ mặc định
+    spawnInterval: 1400, // Giảm thời gian spawn
   },
   
   ground: {
@@ -37,22 +37,26 @@ export const GAME_CONFIG = {
   },
   
   difficulty: {
-    // Độ khó tăng theo điểm
+    // Độ khó tăng theo điểm - KHÓ HƠN & RANDOM HƠN
     scoreBasedDifficulty: true,
     
-    // Cấp độ khó theo điểm (score: {gap, speed})
+    // Cấp độ khó theo điểm - Gap nhỏ hơn, tốc độ nhanh hơn
     levels: [
-      { minScore: 0, gap: 180, speed: 180, spawnInterval: 1800 },
-      { minScore: 5, gap: 170, speed: 200, spawnInterval: 1700 },
-      { minScore: 10, gap: 160, speed: 220, spawnInterval: 1600 },
-      { minScore: 15, gap: 150, speed: 240, spawnInterval: 1500 },
-      { minScore: 20, gap: 145, speed: 260, spawnInterval: 1450 },
-      { minScore: 30, gap: 140, speed: 280, spawnInterval: 1400 },
-      { minScore: 40, gap: 135, speed: 300, spawnInterval: 1350 },
-      { minScore: 50, gap: 130, speed: 320, spawnInterval: 1300 },
+      { minScore: 0, gap: 140, speed: 220, spawnInterval: 1400, gapVariation: 15 },
+      { minScore: 3, gap: 135, speed: 240, spawnInterval: 1350, gapVariation: 15 },
+      { minScore: 6, gap: 130, speed: 260, spawnInterval: 1300, gapVariation: 20 },
+      { minScore: 10, gap: 125, speed: 280, spawnInterval: 1250, gapVariation: 20 },
+      { minScore: 15, gap: 120, speed: 300, spawnInterval: 1200, gapVariation: 25 },
+      { minScore: 20, gap: 118, speed: 320, spawnInterval: 1150, gapVariation: 25 },
+      { minScore: 30, gap: 115, speed: 340, spawnInterval: 1100, gapVariation: 30 },
+      { minScore: 40, gap: 112, speed: 360, spawnInterval: 1050, gapVariation: 30 },
+      { minScore: 50, gap: 110, speed: 380, spawnInterval: 1000, gapVariation: 35 },
     ],
     
-    // Legacy settings (nếu không dùng score-based)
+    // Biến động ngẫu nhiên cho vị trí pipes
+    verticalVariation: 0.4, // 40% chiều cao có thể thay đổi
+    
+    // Legacy settings
     speedIncreaseInterval: 10000,
     speedIncreaseAmount: 20,
     maxSpeed: 400,

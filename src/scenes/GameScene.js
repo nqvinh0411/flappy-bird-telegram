@@ -192,10 +192,15 @@ export class GameScene extends Phaser.Scene {
     
     const pipeX = this.game.config.width + 50;
     
+    // Thêm biến động ngẫu nhiên cho gap
+    const gapVariation = this.currentDifficulty.gapVariation || 0;
+    const randomGap = this.currentGap + Phaser.Math.Between(-gapVariation, gapVariation);
+    const finalGap = Math.max(100, randomGap); // Tối thiểu 100px
+    
     const result = PipeBuilder.createPipePair(
       this,
       pipeX,
-      this.currentGap, // Dùng gap động theo độ khó
+      finalGap, // Gap có biến động ngẫu nhiên
       null,
       this.gameSpeed,
       this.currentTheme,

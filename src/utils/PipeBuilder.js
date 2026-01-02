@@ -91,10 +91,20 @@ export class PipeBuilder {
     const scale = pipeWidth / pipeConfig.frameWidth;
     const capDisplayHeight = pipeConfig.capHeight * scale;
     
-    // Gap position - đảm bảo có đủ không gian cho pipes
-    const minGapY = gap + 80; // Tối thiểu cách trên 80px + gap
-    const maxGapY = gameHeight - groundHeight - gap - 80; // Tối thiểu cách dưới 80px
-    const gapY = Phaser.Math.Between(minGapY, maxGapY);
+    // Gap position - RANDOM HƠN với biến động lớn
+    const verticalVariation = GAME_CONFIG.difficulty.verticalVariation || 0.3;
+    const availableHeight = gameHeight - groundHeight - gap;
+    const variationRange = availableHeight * verticalVariation;
+    
+    // Tính toán vùng an toàn
+    const minSafeGap = 60; // Khoảng cách tối thiểu từ cạnh
+    const minGapY = Math.max(gap + minSafeGap, availableHeight * 0.2);
+    const maxGapY = Math.min(gameHeight - groundHeight - gap - minSafeGap, availableHeight * 0.8);
+    
+    // Random với biến động cao
+    const centerY = (minGapY + maxGapY) / 2;
+    const randomOffset = Phaser.Math.Between(-variationRange, variationRange);
+    const gapY = Phaser.Math.Clamp(centerY + randomOffset, minGapY, maxGapY);
     
     // Sử dụng màu cố định cho cả phiên chơi
     const finalColorIndex = (colorIndex === 'random') ? this.sessionColor : colorIndex;
