@@ -3,9 +3,10 @@ export const GAME_CONFIG = {
   height: 600,
   
   physics: {
-    gravity: 1200,
-    birdVelocity: -400,
-    maxVelocity: 600,
+    gravity: 1000, // Giảm gravity để bay mượt hơn
+    birdVelocity: -350, // Giảm lực nhảy để kiểm soát tốt hơn
+    maxVelocity: 500, // Giảm tốc độ rơi tối đa
+    drag: 0.98, // Thêm drag để chuyển động mượt hơn
   },
   
   bird: {
@@ -36,6 +37,22 @@ export const GAME_CONFIG = {
   },
   
   difficulty: {
+    // Độ khó tăng theo điểm
+    scoreBasedDifficulty: true,
+    
+    // Cấp độ khó theo điểm (score: {gap, speed})
+    levels: [
+      { minScore: 0, gap: 180, speed: 180, spawnInterval: 1800 },
+      { minScore: 5, gap: 170, speed: 200, spawnInterval: 1700 },
+      { minScore: 10, gap: 160, speed: 220, spawnInterval: 1600 },
+      { minScore: 15, gap: 150, speed: 240, spawnInterval: 1500 },
+      { minScore: 20, gap: 145, speed: 260, spawnInterval: 1450 },
+      { minScore: 30, gap: 140, speed: 280, spawnInterval: 1400 },
+      { minScore: 40, gap: 135, speed: 300, spawnInterval: 1350 },
+      { minScore: 50, gap: 130, speed: 320, spawnInterval: 1300 },
+    ],
+    
+    // Legacy settings (nếu không dùng score-based)
     speedIncreaseInterval: 10000,
     speedIncreaseAmount: 20,
     maxSpeed: 400,

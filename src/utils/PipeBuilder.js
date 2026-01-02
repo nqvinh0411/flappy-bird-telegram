@@ -123,6 +123,8 @@ export class PipeBuilder {
     topBody.body.allowGravity = false;
     topBody.body.immovable = true;
     topBody.body.setVelocityX(-speed);
+    // Hitbox khớp với kích thước hiển thị
+    topBody.body.setSize(pipeWidth, topBodyHeight);
     topBody.pipeId = pipeId;
     if (pipeGroup) pipeGroup.add(topBody);
     
@@ -134,6 +136,8 @@ export class PipeBuilder {
     scene.physics.add.existing(topCap);
     topCap.body.allowGravity = false;
     topCap.body.setVelocityX(-speed);
+    // Hitbox cho cap
+    topCap.body.setSize(pipeWidth, capDisplayHeight);
     
     // ========== BOTTOM PIPE ==========
     // Kéo dài từ gap xuống đến ground
@@ -149,6 +153,8 @@ export class PipeBuilder {
     scene.physics.add.existing(bottomCap);
     bottomCap.body.allowGravity = false;
     bottomCap.body.setVelocityX(-speed);
+    // Hitbox cho cap
+    bottomCap.body.setSize(pipeWidth, capDisplayHeight);
     
     // Body - từ cap xuống ground
     const bottomBody = scene.add.image(x, bottomStartY + capDisplayHeight + bottomBodyHeight / 2, bodyKey);
@@ -159,6 +165,8 @@ export class PipeBuilder {
     bottomBody.body.allowGravity = false;
     bottomBody.body.immovable = true;
     bottomBody.body.setVelocityX(-speed);
+    // Hitbox khớp với kích thước hiển thị
+    bottomBody.body.setSize(pipeWidth, bottomBodyHeight);
     bottomBody.pipeId = pipeId;
     if (pipeGroup) pipeGroup.add(bottomBody);
     

@@ -23,6 +23,11 @@ export class GameScene extends Phaser.Scene {
     this.currentTheme = this.settings.theme || 'style1';
     this.currentPipeColor = this.settings.pipeColor || 'random';
     
+    // Độ khó theo điểm
+    this.currentDifficulty = this.getDifficultyLevel(0);
+    this.currentGap = this.currentDifficulty.gap;
+    this.gameSpeed = this.currentDifficulty.speed;
+    
     // Reset pipe color cho phiên chơi mới
     PipeBuilder.resetSession();
   }
@@ -87,11 +92,18 @@ export class GameScene extends Phaser.Scene {
     this.bird.setScale(GAME_CONFIG.bird.scale);
     this.bird.play('bird1-1-fly');
     
-    this.bird.body.setSize(14, 14);
-    this.bird.body.setOffset(1, 1);
+    // Hitbox chính xác theo sprite (16x16 pixels)
+    // Giảm 1-2px mỗi cạnh để tránh collision quá khắc nghiệt
+    this.bird.body.setSize(15, 15);
+    this.bird.body.setOffset(0.5, 0.5);
     
     this.bird.setCollideWorldBounds(false);
     this.bird.body.setMaxVelocity(0, GAME_CONFIG.physics.maxVelocity);
+    
+    // Thêm drag để chuyển động mượt hơn
+    if (GAME_CONFIG.physics.drag) {
+      this.bird.body.setDrag(0, GAME_CONFIG.physics.drag);
+    }
   }
 
   createPipes() {
@@ -144,15 +156,25 @@ export class GameScene extends Phaser.Scene {
   }
 
   startPipeSpawner() {
-    this.pipeTimer = this.time.addEvent({
-      delay: GAME_CONFIG.pipes.spawnInterval,
-      callback: this.spawnPipe,
-      callbackScope: this,
-      loop: true,
-    });
+    this.updatePipeSpawner();
     
     this.time.delayedCall(500, () => {
       this.spawnPipe();
+    });
+  }
+  
+  updatePipeSpawner() {
+    // Xóa timer cũ nếu có
+    if (this.pipeTimer) {
+      this.pipeTimer.remove();
+    }
+    
+    // Tạo timer mới với interval hiện tại
+    this.pipeTimer = this.time.addEvent({
+      delay: this.currentDifficulty.spawnInterval,
+      callback: this.spawnPipe,
+      callbackScope: this,
+      loop: true,
     });
   }
 
@@ -168,25 +190,46 @@ export class GameScene extends Phaser.Scene {
   spawnPipe() {
     if (this.isGameOver) return;
     
-    const gap = GAME_CONFIG.pipes.gap;
     const pipeX = this.game.config.width + 50;
     
     const result = PipeBuilder.createPipePair(
       this,
       pipeX,
-      gap,
-      null, // Không dùng group
+      this.currentGap, // Dùng gap động theo độ khó
+      null,
       this.gameSpeed,
       this.currentTheme,
       this.currentPipeColor
     );
     
     if (result) {
-      // Lưu pipes và add collision
+      // Lưu pipes và caps
       this.pipes.push(result.pipeTop, result.pipeBottom);
+      
+      // Add collision cho bodies và caps
       this.addPipeCollision(result.pipeTop);
       this.addPipeCollision(result.pipeBottom);
+      this.addPipeCollision(result.topCap);
+      this.addPipeCollision(result.bottomCap);
     }
+  }
+  
+  getDifficultyLevel(score) {
+    if (!GAME_CONFIG.difficulty.scoreBasedDifficulty) {
+      return {
+        gap: GAME_CONFIG.pipes.gap,
+        speed: GAME_CONFIG.pipes.speed,
+        spawnInterval: GAME_CONFIG.pipes.spawnInterval
+      };
+    }
+    
+    const levels = GAME_CONFIG.difficulty.levels;
+    for (let i = levels.length - 1; i >= 0; i--) {
+      if (score >= levels[i].minScore) {
+        return levels[i];
+      }
+    }
+    return levels[0];
   }
 
   flap() {
@@ -252,6 +295,9 @@ export class GameScene extends Phaser.Scene {
         this.score += GAME_CONFIG.score.pointsPerPipe;
         this.scoreText.setText(this.score);
         
+        // Cập nhật độ khó theo điểm
+        this.updateDifficulty();
+        
         this.telegram.hapticNotification('success');
         ParticleEffects.createScoreEffect(this, this.bird.x, this.bird.y);
         
@@ -264,6 +310,32 @@ export class GameScene extends Phaser.Scene {
         });
       }
     });
+  }
+  
+  updateDifficulty() {
+    if (!GAME_CONFIG.difficulty.scoreBasedDifficulty) return;
+    
+    const newDifficulty = this.getDifficultyLevel(this.score);
+    
+    // Nếu độ khó thay đổi
+    if (newDifficulty.minScore !== this.currentDifficulty.minScore) {
+      this.currentDifficulty = newDifficulty;
+      this.currentGap = newDifficulty.gap;
+      this.gameSpeed = newDifficulty.speed;
+      
+      // Cập nhật tốc độ pipes hiện có
+      this.pipes.forEach(pipe => {
+        if (pipe.body) {
+          pipe.body.setVelocityX(-this.gameSpeed);
+        }
+        if (pipe.cap && pipe.cap.body) {
+          pipe.cap.body.setVelocityX(-this.gameSpeed);
+        }
+      });
+      
+      // Cập nhật spawn interval
+      this.updatePipeSpawner();
+    }
   }
 
   cleanupPipes() {
