@@ -1,0 +1,110 @@
+[
+  {
+    "name": "Bird Style 1-1",
+    "path": "public/assets/Player/StyleBird1/Bird1-1.png",
+    "totalWidth": 64,
+    "totalHeight": 16,
+    "layout": "horizontal",
+    "frameWidth": 16,
+    "frameHeight": 16,
+    "frameCount": 4
+  },
+  {
+    "name": "Bird Style 1-2",
+    "path": "public/assets/Player/StyleBird1/Bird1-2.png",
+    "totalWidth": 64,
+    "totalHeight": 16,
+    "layout": "horizontal",
+    "frameWidth": 16,
+    "frameHeight": 16,
+    "frameCount": 4
+  },
+  {
+    "name": "Bird Style 1-3",
+    "path": "public/assets/Player/StyleBird1/Bird1-3.png",
+    "totalWidth": 64,
+    "totalHeight": 16,
+    "layout": "horizontal",
+    "frameWidth": 16,
+    "frameHeight": 16,
+    "frameCount": 4
+  },
+  {
+    "name": "Bird Style 1-4",
+    "path": "public/assets/Player/StyleBird1/Bird1-4.png",
+    "totalWidth": 64,
+    "totalHeight": 16,
+    "layout": "horizontal",
+    "frameWidth": 16,
+    "frameHeight": 16,
+    "frameCount": 4
+  },
+  {
+    "name": "Bird Style 2-1",
+    "path": "public/assets/Player/StyleBird2/Bird2-1.png",
+    "totalWidth": 64,
+    "totalHeight": 16,
+    "layout": "horizontal",
+    "frameWidth": 16,
+    "frameHeight": 16,
+    "frameCount": 4
+  },
+  {
+    "name": "Pipes Style 1",
+    "path": "public/assets/Style 1/Pipes-1.png",
+    "totalWidth": 512,
+    "totalHeight": 640,
+    "layout": "grid",
+    "frameWidth": 128,
+    "frameHeight": 213,
+    "cols": 4,
+    "rows": 3,
+    "frameCount": 12
+  },
+  {
+    "name": "Pipes Style 2",
+    "path": "public/assets/Style 2/Pipes-2.png",
+    "totalWidth": 512,
+    "totalHeight": 384,
+    "layout": "grid",
+    "frameWidth": 128,
+    "frameHeight": 128,
+    "cols": 4,
+    "rows": 3,
+    "frameCount": 12
+  },
+  {
+    "name": "Ground Tiles Style 1",
+    "path": "public/assets/Style 1/Tiles-1.png",
+    "totalWidth": 512,
+    "totalHeight": 128,
+    "layout": "vertical",
+    "frameWidth": 512,
+    "frameHeight": 64,
+    "frameCount": 2
+  },
+  {
+    "name": "Ground Tiles Style 2",
+    "path": "public/assets/Style 2/Tile-2.png",
+    "totalWidth": 256,
+    "totalHeight": 128,
+    "layout": "vertical",
+    "frameWidth": 256,
+    "frameHeight": 64,
+    "frameCount": 2
+  },
+  {
+    "name": "Tileset Style 1",
+    "path": "public/assets/Style 1/Tileset-1.png",
+    "totalWidth": 1408,
+    "totalHeight": 320,
+    "layout": "complex"
+  },
+  {
+    "name": "Tileset Style 2",
+    "path": "public/assets/Style 2/Tileset-2.png",
+    "totalWidth": 1408,
+    "totalHeight": 320,
+    "layout": "complex"
+  }
+]
