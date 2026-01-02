@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { SPRITE_CONFIG } from '../config/assetConfig.js';
+import GAME_CONFIG from '../config/gameConfig.js';
 
 /**
  * PipeBuilder - Tạo pipes từ Pipes-1.png
@@ -83,7 +84,7 @@ export class PipeBuilder {
     
     const gameWidth = scene.game.config.width;
     const gameHeight = scene.game.config.height;
-    const groundHeight = gameHeight * 0.12; // 12% chiều cao màn hình
+    const groundHeight = GAME_CONFIG.ground.height; // Dùng giá trị thực tế từ config
     
     // Scale pipe width theo màn hình (khoảng 8% chiều rộng)
     const pipeWidth = Math.round(gameWidth * 0.13);
